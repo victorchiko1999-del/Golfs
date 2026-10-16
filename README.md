@@ -352,7 +352,7 @@ function startHole(k){hn=k==='y'?10:1;SCO[hn]={n:0,done:false};ball.visible=true
 function fx(now){const R=holeR(),d=SCO[hn].done;zone.scale.setScalar(R*(d?1:1+.05*Math.sin(now/300)));
   if(sinkT){const k=Math.min((now-sinkT)/650,1);ball.position.y=RISE+.6-1.1*k;if(k>=1){ball.visible=false;sinkT=0}}
   if(fxT){const k=(now-fxT)/1100;if(k>=1){fxT=0;burst.visible=false;flag.rotation.y=0}else{burst.visible=true;burst.scale.setScalar(R*(1+3.5*k));burst.material.opacity=.9*(1-k);flag.rotation.y=Math.sin(k*40)*.5*(1-k)}}}
-document.getElementById('rs').onclick=()=>{SCO={1:{n:0,done:false},10:{n:0,done:false}};startHole(hn===10?'y':'r')};
+document.getElementById('rs').onclick=()=>{SCO={1:{n:0,done:false},10:{n:0,done:false}};gReset();startHole(hn===10?'y':'r')};
 renderSC();
 
 /* GPS real */
@@ -362,7 +362,7 @@ const accRing=new THREE.Mesh(new THREE.RingGeometry(.94,1,48),new THREE.MeshBasi
 const gS=t=>{gsEl.textContent=t};
 function gSave(){try{localStorage.setItem('gpsCal',JSON.stringify({gTee,gHole,gk,gCal}))}catch(e){}}
 try{const j=JSON.parse(localStorage.getItem('gpsCal')||'null');if(j){gTee=j.gTee;gHole=j.gHole;gk=j.gk||'y';gCal=j.gCal}}catch(e){}
-function gUI(){gb[0].textContent=(gTee?'\u2713 ':'1 \u00b7 ')+'Estoy en el tee';gb[1].textContent=(gHole?'\u2713 ':'2 \u00b7 ')+'Estoy en el hoyo';gb[0].classList.toggle('ok',!!gTee);gb[1].classList.toggle('ok',!!gHole);gb[2].disabled=false}
+function gUI(){gb[0].textContent=(gTee?'\u2713 ':'1 \u00b7 ')+'Estoy en el tee'+(gTee?' (borrar)':'');gb[1].textContent=(gHole?'\u2713 ':'2 \u00b7 ')+'Estoy en el hoyo'+(gHole?' (borrar)':'');gb[0].classList.toggle('ok',!!gTee);gb[1].classList.toggle('ok',!!gHole);gb[2].disabled=false}
 function gCalc(){if(!gTee||!gHole)return;const q=p=>[(p.lon-gHole.lon)*Math.cos(gHole.lat*Math.PI/180)*111320,-(p.lat-gHole.lat)*110574],t=q(gTee),m=TEE[gk];
   gCal={lat:gHole.lat,lon:gHole.lon,phi:Math.atan2(m[1],m[0])-Math.atan2(t[1],t[0])};gSave();
   const d=Math.hypot(t[0],t[1]),dm=Math.hypot(m[0],m[1]);gS(Math.abs(d-dm)>dm*.25?'Calibrado, pero la distancia tee-hoyo medida ('+Math.round(d)+' m) no cuadra con '+Math.round(dm)+' m. Rep\u00edtelo.':'Calibrado \u00b7 tee-hoyo '+Math.round(d)+' m')}
@@ -382,7 +382,7 @@ function gMeasure(i){if(!gLast){gS('Esperando se\u00f1al GPS\u2026');return}cons
   const iv=setInterval(()=>{b.textContent='Midiendo\u2026 '+Math.max(0,6-Math.floor((Date.now()-t0)/1000))+' s';
     if(Date.now()-t0>=6000){clearInterval(iv);const a=gBuf.length?gBuf:[gLast],m=a.reduce((r,p)=>({lat:r.lat+p.lat/a.length,lon:r.lon+p.lon/a.length}),{lat:0,lon:0});gBuf=null;b.disabled=false;
       if(i===0)gTee=m;else gHole=m;gCalc();gUI()}},500)}
-gb[0].onclick=()=>{gk=hn===10?'y':'r';gMeasure(0)};gb[1].onclick=()=>gMeasure(1);
+gb[0].onclick=()=>{if(gTee){gClear(0);return}gk=hn===10?'y':'r';gMeasure(0)};gb[1].onclick=()=>{if(gHole){gClear(1);return}gMeasure(1)};
 gb[2].onclick=()=>{if(!gMe.s)return gManual();if(gMe.s)shot(gMe.x,gMe.z,true);else gS('Esperando tu posici\u00f3n\u2026')};
 gb[3].onclick=()=>{if(demoT)gDemo();gStop()};
 gpsb.onclick=()=>{const o=gpp.classList.toggle('open');if(o&&!gOn){gStart();setTimeout(()=>{if(gOn&&!gLast&&!demoT)gS('Sin respuesta del GPS tras 12 s. Puede estar bloqueado en este visor: prueba el modo demo o abre la página en el navegador.')},12000)}};
@@ -397,6 +397,8 @@ function gDemo(){const b=document.getElementById('g5');
     gFix({coords:{latitude:gCal.lat-z/110574,longitude:gCal.lon+x/(111320*Math.cos(gCal.lat*Math.PI/180)),accuracy:4}});gS('DEMO · a '+Math.round(Math.hypot(x,z))+' m del hoyo')};
   tick();demoT=setInterval(tick,1000)}
 gErr=function(e){gS((e.code===1?'Ubicación bloqueada por el visor o por los permisos del móvil':'Sin señal GPS')+' (código '+e.code+'). Prueba el modo demo o abre la página en el navegador.')};
+function gClear(i){if(i===0)gTee=null;else gHole=null;gCal=null;gMe.s=false;accRing.visible=false;gSave();gUI();gS(i===0?'Punto del tee borrado. Vuelve a marcarlo.':'Punto del hoyo borrado. Vuelve a marcarlo.')}
+function gReset(){gTee=null;gHole=null;gCal=null;gMe.s=false;accRing.visible=false;try{localStorage.removeItem('gpsCal')}catch(e){}gUI();gS(gOn?'Calibración borrada. Marca el tee y el hoyo de nuevo.':'GPS apagado')}
 document.getElementById('g5').onclick=gDemo;
 gUI();gS('GPS apagado');
 
