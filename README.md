@@ -138,6 +138,13 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 #d{white-space:nowrap}
 .tees button{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1;padding:6px 12px}
 .tees em{display:block;margin:0;font-size:10px}
+.gp-v{font-size:10.5px;color:var(--mut);text-align:right;padding-top:6px}
+.wx{position:absolute;right:10px;top:54px;z-index:15;display:flex;align-items:center;gap:8px;padding:5px 10px 5px 8px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(14,20,16,.42);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 8px 24px rgba(0,0,0,.28);max-width:58%}
+.wx svg{width:22px;height:22px;flex:none;fill:var(--acc);transition:transform .8s cubic-bezier(.3,1.3,.5,1)}
+.wx b{display:block;font:700 15px/1.1 ui-serif,Georgia,serif}
+.wx span{display:block;font-size:10.5px;line-height:1.25;color:var(--mut)}
+.wx:active{transform:scale(.97)}
+.wx{max-width:calc(100% - 204px)}
 </style>
 </head>
 <body>
@@ -146,11 +153,11 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
   <div class="bar" id="views">
     <button data-v="3d" class="on">3D</button><button data-v="top">Cenital</button><button data-v="green">Green</button><button data-v="side">Perfil</button>
   </div>
-  <div class='sc'><div class='sc-t'><b>Marcador</b><button id='rs' aria-label='Reiniciar puntuación'>&#8634;</button></div><table id='sct'></table></div><div class='bn' id='bn'></div>
+  <div class='sc'><div class='sc-t'><b>Marcador</b><button id='rs' aria-label='Reiniciar puntuación'>&#8634;</button></div><table id='sct'></table></div><div class='bn' id='bn'></div><div class='wx' id='wx' title='Datos: Open-Meteo.com'><svg id='wxA' viewBox='0 0 24 24'><circle cx='12' cy='19.5' r='2'/><path d='M10.5 18 9 3.5 12 7 15 3.5 13.5 18Z'/></svg><div><b id='wxT'>--</b><span id='wxW'>cargando el tiempo…</span></div></div>
   <div class="hud">
     <div class="row"><span class="lab">Hasta el hoyo</span><span class="lab" id="from">Tee 10</span></div>
     <div id="d">89,0<small>m</small></div>
-    <button class='fab gpsb' id='gpsb' aria-label='GPS'><svg viewBox='0 0 48 48'><circle cx='24' cy='24' r='8'/><path d='M24 5v9M24 34v9M5 24h9M34 24h9'/></svg></button><div class='gpp' id='gpp'><div class='gp-s' id='gps'></div><button id='g1'></button><button id='g2'></button><button id='g3' class='go'>Marcar golpe</button><button id='g5'>Probar sin GPS (demo)</button><button id='g4'>Salir del GPS</button></div><button class='fab' id='fab' aria-label='Elegir palo'><svg viewBox='0 0 48 48'><g class='g1'><path d='M37 5 24 29'/><path d='M11 41 22 27 28 30 27 41Z'/></g><g class='g2'><path d='M15 15 33 33M33 15 15 33'/></g></svg></button><div class='sheet' id='sheet' role='dialog' aria-label='Palo recomendado'><div class='sh'><div><div class='k'>Palo recomendado a</div><div class='v' id='sd'>89,0 m</div></div><button class='x' id='x' aria-label='Cerrar'>&times;</button></div><div class='nt' id='sn'></div><div id='clubs'></div></div>
+    <button class='fab gpsb' id='gpsb' aria-label='GPS'><svg viewBox='0 0 48 48'><circle cx='24' cy='24' r='8'/><path d='M24 5v9M24 34v9M5 24h9M34 24h9'/></svg></button><div class='gpp' id='gpp'><div class='gp-s' id='gps'></div><button id='g1'></button><button id='g2'></button><button id='g3' class='go'>Marcar golpe</button><button id='g5'>Probar sin GPS (demo)</button><button id='g4'>Salir del GPS</button><div class='gp-v'>Versión 5 · Tiempo: Open-Meteo.com</div></div><button class='fab' id='fab' aria-label='Elegir palo'><svg viewBox='0 0 48 48'><g class='g1'><path d='M37 5 24 29'/><path d='M11 41 22 27 28 30 27 41Z'/></g><g class='g2'><path d='M15 15 33 33M33 15 15 33'/></g></svg></button><div class='sheet' id='sheet' role='dialog' aria-label='Palo recomendado'><div class='sh'><div><div class='k'>Palo recomendado a</div><div class='v' id='sd'>89,0 m</div></div><button class='x' id='x' aria-label='Cerrar'>&times;</button></div><div class='nt' id='sn'></div><div id='clubs'></div></div>
     <div class="tees"><button data-t="y" class="on">Tee 10<em>89 m</em></button><button data-t="r">Tee 1<em>79 m</em></button></div>
     <div class="hint">Toca el mapa para colocar la bola. Arrastra para girar, pellizca para acercar. Relieve exagerado ×2,6.</div>
   </div>
@@ -309,11 +316,11 @@ function drawClubs(now){const dt=Math.min((now-lastT)/1000,.05);lastT=now;let an
     u.ring.material.color.set(u.best?0xd3b56e:0x3a3e42);u.ring.material.emissive.set(u.best?0x6b4f12:0)});
   rd.autoClear=false;rd.setScissorTest(true);rd.setViewport(x,y,w,h);rd.setScissor(x,y,w,h);rd.clearDepth();rd.render(cs3,cc);rd.setScissorTest(false);rd.setViewport(0,0,app.clientWidth,app.clientHeight);rd.autoClear=true}
 let cur={L:89,eff:89,g:0},prev=[0,0,0,0],isOpen=false;
-function pct(){const s=CL.map(c=>c.put?[0,.5,14][cur.g]:Math.exp(-.5*((cur.eff-c.c)/c.w)**2)),t=s.reduce((a,b)=>a+b,0)||1,p=s.map(v=>Math.round(v/t*100));p[p.indexOf(Math.max(...p))]+=100-p.reduce((a,b)=>a+b,0);return p}
+function pct(){const s=CL.map(c=>c.put?[0,.5,14][cur.g]:Math.exp(-.5*((cur.eff*wxF()-c.c)/c.w)**2)),t=s.reduce((a,b)=>a+b,0)||1,p=s.map(v=>Math.round(v/t*100));p[p.indexOf(Math.max(...p))]+=100-p.reduce((a,b)=>a+b,0);return p}
 function cnt(el,a,b){const t0=performance.now();(function f(n){const k=Math.min((n-t0)/600,1);el.textContent=Math.round(a+(b-a)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)})(t0)}
-function upd(){const p=pct(),m=p.indexOf(Math.max(...p)),d=cur.eff-cur.L;
+function upd(){const p=pct(),m=p.indexOf(Math.max(...p)),d=cur.eff*wxF()-cur.L;
   sdEl.textContent=fmt(cur.L)+' m';
-  snEl.textContent=cur.g?['','Estás en el borde del green.','Estás sobre el green.'][cur.g]:(Math.abs(d)<.5?'Terreno llano: juega a la distancia real.':(d>0?'Subida':'Bajada')+' de '+fmt(Math.abs(d))+' m: juega como '+fmt(cur.eff)+' m.')+(cur.eff>160?' Más lejos de lo que alcanzan estos palos.':'');
+  snEl.textContent=cur.g?['','Estás en el borde del green.','Estás sobre el green.'][cur.g]:(Math.abs(d)<.5?'Terreno llano: juega a la distancia real.':(wxF()!==1?'Desnivel y viento':(d>0?'Subida':'Bajada'))+' de '+fmt(Math.abs(d))+' m: juega como '+fmt(cur.eff*wxF())+' m.')+(cur.eff>160?' Más lejos de lo que alcanzan estos palos.':'');
   [...rowsEl.children].forEach((r,i)=>{const el=r.querySelector('.pc b');r.style.setProperty('--p',p[i]);r.classList.toggle('best',i===m);CLUB[i].userData.best=i===m;if(isOpen){if(prev[i]!==p[i])cnt(el,prev[i],p[i])}else el.textContent=p[i]});
   if(isOpen)prev=p}
 function openSheet(o){isOpen=o;const hr=document.querySelector('.hud').getBoundingClientRect(),a=fab.getBoundingClientRect();
@@ -349,9 +356,9 @@ function oob(x,z){if(pip(x,z))return null;let bd=1e9,bq=null,bn=null;
 function shot(x,z,g){if(gOn&&(gCal||demoT)&&!g){banner('Modo GPS','Pulsa Marcar golpe donde est\u00e9 tu bola',1);return}const s=SCO[hn];if(s.done){banner('Hoyo terminado','Elige un tee o reinicia para repetirlo',1);return}
   s.n++;const o=oob(x,z);if(o){s.n++;setBall(o[0],o[1]);banner('Out of bounds','Fuera de límites · +1 golpe de penalización',2)}else if(Math.hypot(x,z)<=holeR()){setBall(0,0);s.done=true;holedFx()}else setBall(x,z);renderSC(1)}
 function startHole(k){hn=k==='y'?10:1;SCO[hn]={n:0,done:false};ball.visible=true;sinkT=fxT=0;burst.visible=false;flag.rotation.y=0;setBall(...TEE[k],k==='y'?'Tee 10':'Tee 1');renderSC()}
-function fx(now){const R=holeR(),d=SCO[hn].done;zone.scale.setScalar(R*(d?1:1+.05*Math.sin(now/300)));
+function fx(now){if(!fxT)flag.rotation.y=FB+Math.sin(now/380)*.09*Math.min(1,(WX.w?WX.w.v:0)/6);const R=holeR(),d=SCO[hn].done;zone.scale.setScalar(R*(d?1:1+.05*Math.sin(now/300)));
   if(sinkT){const k=Math.min((now-sinkT)/650,1);ball.position.y=RISE+.6-1.1*k;if(k>=1){ball.visible=false;sinkT=0}}
-  if(fxT){const k=(now-fxT)/1100;if(k>=1){fxT=0;burst.visible=false;flag.rotation.y=0}else{burst.visible=true;burst.scale.setScalar(R*(1+3.5*k));burst.material.opacity=.9*(1-k);flag.rotation.y=Math.sin(k*40)*.5*(1-k)}}}
+  if(fxT){const k=(now-fxT)/1100;if(k>=1){fxT=0;burst.visible=false;flag.rotation.y=0}else{burst.visible=true;burst.scale.setScalar(R*(1+3.5*k));burst.material.opacity=.9*(1-k);flag.rotation.y=FB+Math.sin(k*40)*.5*(1-k)}}}
 document.getElementById('rs').onclick=()=>{SCO={1:{n:0,done:false},10:{n:0,done:false}};gReset();startHole(hn===10?'y':'r')};
 renderSC();
 
@@ -359,6 +366,13 @@ renderSC();
 let gw=null,gLast=null,gOn=false,gCal=null,gBuf=null,gTee=null,gHole=null,gk='y',gMe={x:0,z:0,s:false};
 const gpp=document.getElementById('gpp'),gpsb=document.getElementById('gpsb'),gsEl=document.getElementById('gps'),gb=[1,2,3,4].map(n=>document.getElementById('g'+n));
 const accRing=new THREE.Mesh(new THREE.RingGeometry(.94,1,48),new THREE.MeshBasicMaterial({color:0x5ac8fa,transparent:true,opacity:.65,depthTest:false,side:THREE.DoubleSide}));accRing.rotation.x=-Math.PI/2;accRing.renderOrder=7;accRing.visible=false;scene.add(accRing);
+const meDot=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),new THREE.MeshBasicMaterial({color:0x2f9bff,depthTest:false}));
+const meHalo=new THREE.Mesh(new THREE.RingGeometry(1.15,1.5,40),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.95,depthTest:false,side:THREE.DoubleSide}));
+meHalo.rotation.x=-Math.PI/2;meDot.renderOrder=8;meHalo.renderOrder=7;meDot.visible=false;meHalo.visible=false;scene.add(meDot,meHalo);
+const trail=[],trGeo=new THREE.BufferGeometry(),trPts=new THREE.Points(trGeo,new THREE.PointsMaterial({color:0x5ac8fa,size:5,sizeAttenuation:false,depthTest:false,transparent:true,opacity:.9}));trPts.renderOrder=7;trPts.frustumCulled=false;scene.add(trPts);
+function meUpdate(x,z){const y=H(x,z)+.4;trail.push(x,y,z);if(trail.length>900)trail.splice(0,3);trGeo.setAttribute('position',new THREE.Float32BufferAttribute(trail,3));meDot.position.set(x,y+.3,z);meHalo.position.set(x,y+.3,z);meDot.visible=true;meHalo.visible=true}
+function meClear(){trail.length=0;trGeo.setAttribute('position',new THREE.Float32BufferAttribute([],3));meDot.visible=false;meHalo.visible=false}
+function meFrame(now){if(!meDot.visible)return;const d=cam.position.distanceTo(meDot.position),s=Math.max(.5,d*.011),p=1+.18*Math.sin(now/260);meDot.scale.setScalar(s);meHalo.scale.setScalar(s*p)}
 const gS=t=>{gsEl.textContent=t};
 function gSave(){try{localStorage.setItem('gpsCal',JSON.stringify({gTee,gHole,gk,gCal}))}catch(e){}}
 try{const j=JSON.parse(localStorage.getItem('gpsCal')||'null');if(j){gTee=j.gTee;gHole=j.gHole;gk=j.gk||'y';gCal=j.gCal}}catch(e){}
@@ -372,12 +386,12 @@ function gFix(p){const c=p.coords;gLast={lat:c.latitude,lon:c.longitude,acc:c.ac
   const[x,z]=gW(c.latitude,c.longitude);if(Math.abs(x)>400||Math.abs(z)>400){gS('Fuera del campo \u00b7 a '+Math.round(Math.hypot(x,z))+' m del hoyo');accRing.visible=false;return}
   if(gMe.s){gMe.x+=.4*(x-gMe.x);gMe.z+=.4*(z-gMe.z)}else{gMe.x=x;gMe.z=z;gMe.s=true}
   gS('GPS \u00b1'+Math.round(c.accuracy)+' m');
-  if(gOn&&!SCO[hn].done){setBall(gMe.x,gMe.z,'GPS');accRing.visible=true;accRing.position.set(gMe.x,H(gMe.x,gMe.z)+.3,gMe.z);accRing.scale.setScalar(Math.max(1.5,Math.min(c.accuracy,30)))}}
+  meUpdate(gMe.x,gMe.z);if(gOn&&!SCO[hn].done){setBall(gMe.x,gMe.z,'GPS');accRing.visible=true;accRing.position.set(gMe.x,H(gMe.x,gMe.z)+.3,gMe.z);accRing.scale.setScalar(Math.max(1.5,Math.min(c.accuracy,30)))}}
 function gErr(e){gS(e.code===1?'Ubicaci\u00f3n bloqueada: perm\u00edtela en Ajustes o abre la p\u00e1gina fuera de la vista previa.':'Sin se\u00f1al GPS \u00b7 sal a cielo abierto.')}
 function gStart(){if(!navigator.geolocation){gS('Este navegador no permite GPS.');return}gOn=true;gpsb.classList.add('on');gS('Buscando se\u00f1al\u2026');
   try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}
   gw=navigator.geolocation.watchPosition(gFix,gErr,{enableHighAccuracy:true,maximumAge:1000,timeout:20000})}
-function gStop(){if(gw!==null)navigator.geolocation.clearWatch(gw);gw=null;gOn=false;gLast=null;gMe.s=false;accRing.visible=false;gpsb.classList.remove('on');gpp.classList.remove('open');gS('GPS apagado')}
+function gStop(){meClear();if(gw!==null)navigator.geolocation.clearWatch(gw);gw=null;gOn=false;gLast=null;gMe.s=false;accRing.visible=false;gpsb.classList.remove('on');gpp.classList.remove('open');gS('GPS apagado')}
 function gMeasure(i){if(!gLast){gS('Esperando se\u00f1al GPS\u2026');return}const b=gb[i],t0=Date.now();gBuf=[];b.disabled=true;
   const iv=setInterval(()=>{b.textContent='Midiendo\u2026 '+Math.max(0,6-Math.floor((Date.now()-t0)/1000))+' s';
     if(Date.now()-t0>=6000){clearInterval(iv);const a=gBuf.length?gBuf:[gLast],m=a.reduce((r,p)=>({lat:r.lat+p.lat/a.length,lon:r.lon+p.lon/a.length}),{lat:0,lon:0});gBuf=null;b.disabled=false;
@@ -389,18 +403,34 @@ gpsb.onclick=()=>{const o=gpp.classList.toggle('open');if(o&&!gOn){gStart();setT
 let demoT=null,gSaved=null;
 function gManual(){const s=SCO[hn];if(s.done){banner('Hoyo terminado','Elige un tee o reinicia para repetirlo',1);return}s.n++;renderSC(1);banner('Golpe '+s.n,'Contado a mano: aún sin posición GPS',1)}
 function gDemo(){const b=document.getElementById('g5');
-  if(demoT){clearInterval(demoT);demoT=null;gCal=gSaved;gMe.s=false;accRing.visible=false;gOn=gw!==null;gpsb.classList.toggle('on',gOn);b.textContent='Probar sin GPS (demo)';gS('Demo parada');gUI();return}
+  if(demoT){clearInterval(demoT);demoT=null;meClear();gCal=gSaved;gMe.s=false;accRing.visible=false;gOn=gw!==null;gpsb.classList.toggle('on',gOn);b.textContent='Probar sin GPS (demo)';gS('Demo parada');gUI();return}
   if(gw!==null){navigator.geolocation.clearWatch(gw);gw=null}
-  gSaved=gCal;gCal={lat:42.3,lon:3.07,phi:0};gOn=true;gMe.s=false;gpsb.classList.add('on');b.textContent='Parar demo';
+  meClear();gSaved=gCal;gCal={lat:42.3,lon:3.07,phi:0};gOn=true;gMe.s=false;gpsb.classList.add('on');b.textContent='Parar demo';
   const m=TEE[hn===10?'y':'r'];let k=0;
   const tick=()=>{k=Math.min(k+.03,1);const x=m[0]*(1-k)+(Math.random()-.5)*3,z=m[1]*(1-k)+(Math.random()-.5)*3;
     gFix({coords:{latitude:gCal.lat-z/110574,longitude:gCal.lon+x/(111320*Math.cos(gCal.lat*Math.PI/180)),accuracy:4}});gS('DEMO · a '+Math.round(Math.hypot(x,z))+' m del hoyo')};
   tick();demoT=setInterval(tick,1000)}
 gErr=function(e){gS((e.code===1?'Ubicación bloqueada por el visor o por los permisos del móvil':'Sin señal GPS')+' (código '+e.code+'). Prueba el modo demo o abre la página en el navegador.')};
-function gClear(i){if(i===0)gTee=null;else gHole=null;gCal=null;gMe.s=false;accRing.visible=false;gSave();gUI();gS(i===0?'Punto del tee borrado. Vuelve a marcarlo.':'Punto del hoyo borrado. Vuelve a marcarlo.')}
-function gReset(){gTee=null;gHole=null;gCal=null;gMe.s=false;accRing.visible=false;try{localStorage.removeItem('gpsCal')}catch(e){}gUI();gS(gOn?'Calibración borrada. Marca el tee y el hoyo de nuevo.':'GPS apagado')}
+function gClear(i){meClear();if(i===0)gTee=null;else gHole=null;gCal=null;gMe.s=false;accRing.visible=false;gSave();gUI();gS(i===0?'Punto del tee borrado. Vuelve a marcarlo.':'Punto del hoyo borrado. Vuelve a marcarlo.')}
+function gReset(){meClear();gTee=null;gHole=null;gCal=null;gMe.s=false;accRing.visible=false;try{localStorage.removeItem('gpsCal')}catch(e){}gUI();gS(gOn?'Calibración borrada. Marca el tee y el hoyo de nuevo.':'GPS apagado')}
 document.getElementById('g5').onclick=gDemo;
 gUI();gS('GPS apagado');
+
+/* Tiempo real */
+const WX={lat:42.315,lon:3.095,w:null},wxT=document.getElementById('wxT'),wxW=document.getElementById('wxW'),wxA=document.getElementById('wxA'),wxB=document.getElementById('wx');
+let hb=null;try{const v=parseFloat(localStorage.getItem('hb'));if(!isNaN(v))hb=v}catch(e){}
+let FB=0;
+const card=d=>['N','NE','E','SE','S','SO','O','NO'][Math.round(d/45)%8];
+function playBearing(){if(!gCal)return hb;const m=TEE[hn===10?'y':'r'],fx=-m[0],fz=-m[1],c=Math.cos(gCal.phi),s=Math.sin(gCal.phi),qx=fx*c+fz*s,qz=-fx*s+fz*c;return(Math.atan2(qx,-qz)*180/Math.PI+360)%360}
+function wxF(){const w=WX.w,b=playBearing();if(!w||b===null||cur.g)return 1;const rel=((w.d+180-b)%360+360)%360,hw=-w.v*Math.cos(rel*Math.PI/180),a=hw>0?.02*hw:.01*hw;return 1+Math.max(-.25,Math.min(.25,a))}
+function wxRender(){const w=WX.w;if(!w)return;wxT.textContent=Math.round(w.t)+'°C';const kmh=Math.round(w.v*3.6),b=playBearing();
+  if(b===null){wxA.style.transform='rotate('+((w.d+180)%360)+'deg)';wxW.textContent=kmh+' km/h del '+card(w.d)+' · toca para orientar';return}
+  const rel=((w.d+180-b)%360+360)%360,hw=-w.v*Math.cos(rel*Math.PI/180)*3.6;wxA.style.transform='rotate('+rel+'deg)';FB=(90-rel)*Math.PI/180;
+  wxW.textContent=kmh+' km/h · '+(hw>=0?'en contra ':'a favor ')+Math.round(Math.abs(hw))+' km/h'}
+async function wxLoad(){try{const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+WX.lat+'&longitude='+WX.lon+'&current=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms&timezone=auto'),j=await r.json(),c=j.current;
+  WX.w={t:c.temperature_2m,v:c.wind_speed_10m,d:c.wind_direction_10m,g:c.wind_gusts_10m};wxRender();upd()}catch(e){wxT.textContent='--';wxW.textContent='Sin datos del tiempo (solo en la web alojada)'}}
+wxB.onclick=()=>{if(!gCal){const v=parseFloat(prompt('Rumbo del hoyo desde el tee, en grados (0 = norte, 90 = este, 180 = sur, 270 = oeste):',hb===null?'':hb));if(!isNaN(v)){hb=((v%360)+360)%360;try{localStorage.setItem('hb',hb)}catch(e){}}}wxLoad()};
+wxLoad();setInterval(wxLoad,600000);
 
 /* C\u00e1mara */
 const ctl=new THREE.OrbitControls(cam,cv);ctl.enableDamping=true;ctl.maxPolarAngle=Math.PI/2.05;ctl.minPolarAngle=.02;ctl.minDistance=6;ctl.maxDistance=420;
@@ -426,7 +456,7 @@ setBall(...TEE.y,'Tee 10');
 const v3=new THREE.Vector3();
 (function loop(now){requestAnimationFrame(loop);
   if(tw){const k=Math.min((now-tw.t0)/700,1),s=k*k*(3-2*k);cam.position.lerpVectors(tw.p0,tw.p1,s);ctl.target.lerpVectors(tw.t0v,tw.t1,s);if(k>=1)tw=null}
-  ctl.update();rd.render(scene,cam);drawClubs(now);fx(now);
+  ctl.update();rd.render(scene,cam);drawClubs(now);fx(now);meFrame(now);
   const w=app.clientWidth,h=app.clientHeight;
   labels.forEach(o=>{v3.copy(o.pos).project(cam);const off=v3.z>1;o.e.style.display=off?'none':'block';if(!off)o.e.style.transform='translate('+((v3.x*.5+.5)*w)+'px,'+((-v3.y*.5+.5)*h)+'px) translate(-50%,-100%)'})
 })(0);
